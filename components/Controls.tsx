@@ -35,7 +35,7 @@ const ModeSelector: React.FC<{
           key={id}
           onClick={() => onModeChange(id)}
           aria-pressed={currentMode === id}
-          className={`w-full font-semibold py-2 px-4 rounded-lg transition-all duration-300 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 ${
+          className={`w-full font-semibold py-2 px-2 sm:px-4 rounded-lg transition-all duration-300 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 ${
             currentMode === id
               ? 'bg-white dark:bg-slate-700 text-sky-600 dark:text-sky-400 shadow'
               : 'text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800/50'

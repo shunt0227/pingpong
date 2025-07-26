@@ -148,6 +148,8 @@ const ResultsCards: React.FC<{ assignments: AssignmentResult }> = ({ assignments
 // --- Sub-component for Distribution View ---
 const DistributionResultView: React.FC<{ result: DistributionResult }> = ({ result }) => {
   const total = Object.values(result).reduce((sum, count) => sum + count, 0);
+  const maxCount = total > 0 ? Math.max(...Object.values(result)) : -1;
+
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm text-left text-slate-500 dark:text-slate-400 border-collapse">
@@ -158,12 +160,17 @@ const DistributionResultView: React.FC<{ result: DistributionResult }> = ({ resu
           </tr>
         </thead>
         <tbody>
-          {BLOCKS.map((block) => (
-            <tr key={block} className="bg-white dark:bg-slate-800 border-b dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-600/50">
-              <th scope="row" className="px-6 py-4 font-medium text-slate-900 whitespace-nowrap dark:text-white">{block}</th>
-              <td className="px-6 py-4 text-base font-bold text-slate-700 dark:text-slate-200">{result[block]}</td>
-            </tr>
-          ))}
+          {BLOCKS.map((block) => {
+            const isMax = result[block] === maxCount && result[block] > 0;
+            return (
+              <tr key={block} className="bg-white dark:bg-slate-800 border-b dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-600/50">
+                <th scope="row" className="px-6 py-4 font-medium text-slate-900 whitespace-nowrap dark:text-white">{block}</th>
+                <td className={`px-6 py-4 text-base font-bold transition-colors ${isMax ? 'bg-sky-100 dark:bg-sky-900/50 text-sky-600 dark:text-sky-400' : 'text-slate-700 dark:text-slate-200'}`}>
+                  {result[block]}
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
         <tfoot className="text-sm text-slate-800 dark:text-slate-200 bg-slate-100 dark:bg-slate-900/50 font-bold">
             <tr>
@@ -175,6 +182,7 @@ const DistributionResultView: React.FC<{ result: DistributionResult }> = ({ resu
     </div>
   );
 };
+
 
 // --- Main Results Component ---
 interface ResultsProps {
