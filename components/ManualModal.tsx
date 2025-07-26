@@ -52,7 +52,7 @@ const ManualModal: React.FC<ManualModalProps> = ({ isOpen, onClose }) => {
               大会ですでに一部のシード選手（I-1からI-8）のブロックが確定している場合に使用する、高度なモードです。
             </p>
             <ol className="list-decimal list-inside space-y-2 text-slate-600 dark:text-slate-300">
-              <li><strong>モード切替:</strong>「シード飛ばしを利用する」のトグルスイッチをオンにします。</li>
+              <li><strong>モード切替:</strong>「シード飛ばし」を選択します。</li>
               <li><strong>固定ブロックの指定:</strong> 表示された表で、ブロックを固定したい選手（例: I-1）の行にあるプルダウンから、ブロック（例: A）を選択します。複数の選手を固定できます。</li>
               <li><strong>作成ボタン:</strong>「ブロック分けを作成」ボタンを押すと、結果が左右2つのパネルに表示されます。</li>
             </ol>
@@ -67,6 +67,23 @@ const ManualModal: React.FC<ManualModalProps> = ({ isOpen, onClose }) => {
                 <strong>右パネル (チームⅡ ブロック分け結果):</strong><br/>
                 あなたが指定したブロック（例: A, E）だけを使って、新しいチームⅡ（II-1, II-2...）を組んだ場合のシミュレーション結果です。これは参考情報となります。
               </p>
+            </div>
+          </section>
+
+          <div className="border-t border-slate-200 dark:border-slate-700"></div>
+          
+          <section>
+            <h3 className="text-lg font-semibold mb-2 text-sky-600 dark:text-sky-400">人数計算モード</h3>
+            <p className="text-slate-600 dark:text-slate-300 mb-3">
+              トーナメント参加者の総人数を各ブロック（A～H）に、特定の順序で均等に振り分けるシミュレーション機能です。
+            </p>
+            <ol className="list-decimal list-inside space-y-2 text-slate-600 dark:text-slate-300">
+              <li><strong>モード切替:</strong>「人数計算」を選択します。</li>
+              <li><strong>参加者総人数の入力:</strong> トーナメントに参加する全員の人数を入力します。（例: 50）</li>
+              <li><strong>計算ボタン:</strong>「人数を計算」ボタンを押すと、各ブロックに何人ずつ割り振られるかを表形式で表示します。</li>
+            </ol>
+            <div className="mt-4 p-3 bg-slate-100 dark:bg-slate-900/50 rounded-lg text-sm text-slate-600 dark:text-slate-300">
+              <p><strong>振り分け順序:</strong> 人数は <code>AHEDCFGBBGFCDEHA</code> という決まった順序で1人ずつ繰り返し割り振られます。</p>
             </div>
           </section>
         </main>

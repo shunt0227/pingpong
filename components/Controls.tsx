@@ -1,26 +1,59 @@
 import React from 'react';
 import { BLOCKS, ALL_PLAYERS } from '../constants';
+import { AppMode } from '../App';
 
 interface ControlsProps {
+  mode: AppMode;
+  onModeChange: (mode: AppMode) => void;
   team1Count: number;
   setTeam1Count: (count: number) => void;
   team2Count: number;
+  totalParticipants: number | '';
+  setTotalParticipants: (value: number | '') => void;
   onGenerate: () => void;
   onReset: () => void;
   onOpenManual: () => void;
   error: string | null;
-  isSeedSkipMode: boolean;
-  onModeChange: (isSkip: boolean) => void;
   preAssignments: Record<string, string>;
   setPreAssignments: (assignments: Record<string, string>) => void;
 }
+
+const ModeSelector: React.FC<{
+  currentMode: AppMode;
+  onModeChange: (mode: AppMode) => void;
+}> = ({ currentMode, onModeChange }) => {
+  const modes: { id: AppMode; label: string }[] = [
+    { id: 'normal', label: '通常モード' },
+    { id: 'seed-skip', label: 'シード飛ばし' },
+    { id: 'distribution', label: '人数計算' },
+  ];
+
+  return (
+    <div className="flex items-center justify-center mb-8 bg-slate-100 dark:bg-slate-900 p-1 rounded-xl shadow-inner">
+      {modes.map(({ id, label }) => (
+        <button
+          key={id}
+          onClick={() => onModeChange(id)}
+          aria-pressed={currentMode === id}
+          className={`w-full font-semibold py-2 px-4 rounded-lg transition-all duration-300 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800 ${
+            currentMode === id
+              ? 'bg-white dark:bg-slate-700 text-sky-600 dark:text-sky-400 shadow'
+              : 'text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800/50'
+          }`}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+};
 
 const TeamCountsSelector: React.FC<{
   team1Count: number;
   onSelectTeam1Count: (count: number) => void;
   team2Count: number;
 }> = ({ team1Count, onSelectTeam1Count, team2Count }) => (
-  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-end">
+  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-end animate-fade-in">
     <div className="lg:col-span-2">
       <label className="text-lg font-medium text-slate-700 dark:text-slate-300">
         チームⅠの人数
@@ -118,49 +151,80 @@ const SeedSkipControl: React.FC<{
   );
 };
 
+const DistributionCalculatorControl: React.FC<{
+  totalParticipants: number | '';
+  setTotalParticipants: (value: number | '') => void;
+}> = ({ totalParticipants, setTotalParticipants }) => (
+  <div className="animate-fade-in">
+    <label htmlFor="total-participants" className="text-lg font-medium text-slate-700 dark:text-slate-300">
+      トーナメント参加者の総人数
+    </label>
+    <input
+      id="total-participants"
+      type="number"
+      value={totalParticipants}
+      onChange={(e) => setTotalParticipants(e.target.value === '' ? '' : parseInt(e.target.value, 10))}
+      min="1"
+      placeholder="例: 50"
+      className="mt-3 w-full px-4 py-3 bg-white dark:bg-slate-700/60 border-2 border-slate-300 dark:border-slate-600 rounded-lg text-lg focus:ring-sky-500 focus:border-sky-500"
+      aria-label="トーナメント参加者の総人数"
+    />
+  </div>
+);
+
 
 const Controls: React.FC<ControlsProps> = ({
+  mode,
+  onModeChange,
   team1Count,
   setTeam1Count,
   team2Count,
+  totalParticipants,
+  setTotalParticipants,
   onGenerate,
   onReset,
   onOpenManual,
   error,
-  isSeedSkipMode,
-  onModeChange,
   preAssignments,
   setPreAssignments,
 }) => {
+  const generateButtonText: Record<AppMode, string> = {
+    normal: 'ブロック分けを作成',
+    'seed-skip': 'ブロック分けを作成',
+    distribution: '人数を計算',
+  };
+
+  const generateButtonIcon: Record<AppMode, string> = {
+    normal: 'fa-solid fa-sitemap',
+    'seed-skip': 'fa-solid fa-sitemap',
+    distribution: 'fa-solid fa-calculator',
+  };
+
+
   return (
     <div className="w-full max-w-4xl mx-auto p-6 bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700">
       
-      <div className="flex items-center justify-end mb-6">
-        <label htmlFor="seed-skip-toggle" className="mr-3 text-sm font-medium text-gray-900 dark:text-gray-300">シード飛ばしを利用する</label>
-        <label className="relative inline-flex items-center cursor-pointer">
-          <input 
-            type="checkbox" 
-            id="seed-skip-toggle" 
-            className="sr-only peer"
-            checked={isSeedSkipMode}
-            onChange={(e) => onModeChange(e.target.checked)}
-          />
-          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-sky-300 dark:peer-focus:ring-sky-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-sky-600"></div>
-        </label>
-      </div>
-
+      <ModeSelector currentMode={mode} onModeChange={onModeChange} />
+      
       <div className="space-y-8 mb-8">
-        {isSeedSkipMode ? (
-           <SeedSkipControl 
-             preAssignments={preAssignments}
-             setPreAssignments={setPreAssignments}
-           />
-        ) : (
+        {mode === 'normal' && (
           <TeamCountsSelector 
             team1Count={team1Count} 
             onSelectTeam1Count={setTeam1Count} 
             team2Count={team2Count} 
           />
+        )}
+        {mode === 'seed-skip' && (
+           <SeedSkipControl 
+             preAssignments={preAssignments}
+             setPreAssignments={setPreAssignments}
+           />
+        )}
+        {mode === 'distribution' && (
+           <DistributionCalculatorControl
+             totalParticipants={totalParticipants}
+             setTotalParticipants={setTotalParticipants}
+           />
         )}
       </div>
       
@@ -176,8 +240,8 @@ const Controls: React.FC<ControlsProps> = ({
           onClick={onGenerate}
           className="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-md flex items-center justify-center space-x-2"
         >
-          <i className="fa-solid fa-sitemap"></i>
-          <span>ブロック分けを作成</span>
+          <i className={generateButtonIcon[mode]}></i>
+          <span>{generateButtonText[mode]}</span>
         </button>
         <button
           onClick={onOpenManual}

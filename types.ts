@@ -12,3 +12,5 @@ export interface SeedSkipResult {
   team1Full: PlayerAssignment[];
   team2New: PlayerAssignment[];
 }
+
+export type DistributionResult = Record<string, number>;
